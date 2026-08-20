@@ -31,20 +31,21 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import com.example.chatconnect.ui.theme.BorderColor
+import com.example.chatconnect.ui.theme.CardBg
+import com.example.chatconnect.ui.theme.DarkBg
+import com.example.chatconnect.ui.theme.DarkBg2
+import com.example.chatconnect.ui.theme.GlowBlue
+import com.example.chatconnect.ui.theme.NeonBlue
+import com.example.chatconnect.ui.theme.NeonCyan
+import com.example.chatconnect.ui.theme.NeonPurple
+import com.example.chatconnect.ui.theme.NeonPurple2
+import com.example.chatconnect.ui.theme.TealGreen
+import com.example.chatconnect.ui.theme.TextPrimary
+import com.example.chatconnect.ui.theme.TextSecondary
 import kotlinx.coroutines.delay
 
-val DarkBg        = Color(0xFF080B1A)
-val DarkBg2       = Color(0xFF0D1230)
-var NeonBlue      = Color(0xFF3B82F6)
-val NeonCyan      = Color(0xFF06B6D4)
-val NeonPurple    = Color(0xFF8B5CF6)
-val NeonPurple2   = Color(0xFF7C3AED)
-val TealGreen     = Color(0xFF10B981)
-val GlowBlue      = Color(0xFF2563EB)
-val TextPrimary   = Color(0xFFFFFFFF)
-val TextSecondary = Color(0xFFB0B8D1)
-val CardBg        = Color(0xFF111827).copy(alpha = 0.7f)
-val BorderColor   = Color(0xFF1F2B4A)
+
 
 
 @Preview

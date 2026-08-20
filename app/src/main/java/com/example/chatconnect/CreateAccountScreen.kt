@@ -37,6 +37,12 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.chatconnect.ui.theme.DarkBg
+import com.example.chatconnect.ui.theme.DarkBg2
+import com.example.chatconnect.ui.theme.NeonBlue
+import com.example.chatconnect.ui.theme.NeonCyan
+import com.example.chatconnect.ui.theme.NeonPurple
+import com.example.chatconnect.ui.theme.TextPrimary
 
 @Composable
 fun CreateAccountScreen(onBackToLogin: () -> Unit) {
