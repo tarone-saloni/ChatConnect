@@ -37,6 +37,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.chatconnect.AuthManager.signInWithEmail
 import com.example.chatconnect.ui.theme.DarkBg
 import com.example.chatconnect.ui.theme.DarkBg2
 import com.example.chatconnect.ui.theme.NeonBlue
@@ -49,36 +50,11 @@ import com.example.chatconnect.ui.theme.TextPrimary
 fun CompleteScreen(onSignUpClick: () -> Unit = {}){
     var email by remember { mutableStateOf("")}
     var password by remember { mutableStateOf("")}
+    var isLoading by remember { mutableStateOf(false)}
+    var errorMessage by remember { mutableStateOf<String?>(null) }
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
         Background()
-        Column(
-            modifier = Modifier
-                .padding(top = 80.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.applogo),
-                contentDescription = "Logo",
-                modifier = Modifier
-                    .size(160.dp)
-                    .clip(RoundedCornerShape(24.dp)),
-                contentScale = ContentScale.Fit
-            )
-            Text(
-                text = buildAnnotatedString {
-                    withStyle(SpanStyle(color = TextPrimary, fontWeight = FontWeight.Black)) {
-                        append("Nex")
-                    }
-                    withStyle(SpanStyle(
-                        brush = Brush.linearGradient(listOf(NeonBlue, NeonCyan)),
-                        fontWeight = FontWeight.Black
-                    )) {
-                        append("Talk")
-                    }
-                },
-                fontSize = 40.sp,
-                letterSpacing = (-0.5).sp
-            )
+        Logo()
             Spacer(modifier = Modifier.height(20.dp))
             Text(
                 text = "WelCome Back",
@@ -143,7 +119,19 @@ fun CompleteScreen(onSignUpClick: () -> Unit = {}){
                     .height(56.dp)
                     .clip(RoundedCornerShape(16.dp))
                     .background(Brush.linearGradient(listOf(NeonBlue, NeonCyan)))
-                    .clickable { /* Handle Login Click */ },
+                    .clickable {
+                        errorMessage = null
+                        isLoading = true
+                        signInWithEmail(email, password) { success, error ->
+                            isLoading = false
+                            if (success) {
+                                onAuthSuccess()
+                            } else {
+                                errorMessage = error
+                            }
+                        }
+                    },
+                enabled = !isLoading,
                 contentAlignment = Alignment.Center
             ) {
                 Text(

@@ -1,21 +1,27 @@
 package com.example.chatconnect
 
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 
 object AuthManager {
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    val auth = FirebaseAuth.getInstance()
 
-    val currentUser: FirebaseUser?
-        get() = auth.currentUser
-
-    fun isUserLoggedIn(): Boolean {
-        return auth.currentUser != null
+    fun signUpWithEmail(email: String, password: String, onResult: (Boolean, String?) -> Unit) {
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                onResult(task.isSuccessful, task.exception?.message)
+            }
     }
 
-    fun getAuth(): FirebaseAuth = auth
-
+    fun signInWithEmail(email: String, password: String, onResult: (Boolean, String?) -> Unit) {
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                onResult(task.isSuccessful, task.exception?.message)
+            }
+    }
     fun signOut() {
         auth.signOut()
     }
+
+    fun getCurrentUser() = auth.currentUser
+
 }
