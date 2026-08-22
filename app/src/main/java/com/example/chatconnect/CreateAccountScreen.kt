@@ -37,6 +37,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.chatconnect.AuthManager.signUpWithEmail
 import com.example.chatconnect.ui.theme.DarkBg
 import com.example.chatconnect.ui.theme.DarkBg2
 import com.example.chatconnect.ui.theme.NeonBlue
@@ -49,38 +50,13 @@ fun CreateAccountScreen(onBackToLogin: () -> Unit) {
     var fullName by remember { mutableStateOf("")}
     var email by remember { mutableStateOf("")}
     var password by remember { mutableStateOf("")}
+    var isLoading by remember { mutableStateOf(false)}
+    var errorMessage by remember { mutableStateOf<String?>(null) }
     Box(modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.TopCenter) {
         BackgroundforSignUp()
-        Column(
-            modifier = Modifier
-                .padding(top = 80.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.applogo),
-                contentDescription = "Logo",
-                modifier = Modifier
-                    .size(180.dp)
-                    .clip(RoundedCornerShape(24.dp)),
-                contentScale = ContentScale.Fit
-            )
-            Text(
-                text = buildAnnotatedString {
-                    withStyle(SpanStyle(color = TextPrimary, fontWeight = FontWeight.Black)) {
-                        append("Nex")
-                    }
-                    withStyle(SpanStyle(
-                        brush = Brush.linearGradient(listOf(NeonBlue, NeonCyan)),
-                        fontWeight = FontWeight.Black
-                    )) {
-                        append("Talk")
-                    }
-                },
-                fontSize = 40.sp,
-                letterSpacing = (-0.5).sp
-            )
-            Spacer(modifier = Modifier.height(12.dp))
+        Logo()
+                 Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = "Create an Account",
                 color = Color.White,
@@ -167,19 +143,18 @@ fun CreateAccountScreen(onBackToLogin: () -> Unit) {
                     .clip(RoundedCornerShape(16.dp))
                     .background(Brush.linearGradient(listOf(NeonBlue, NeonCyan)))
                     .clickable {
-                        AuthManager.getAuth()
-                        .createUserWithEmailAndPassword(
-                            email.trim(),
-                            password.trim()
-                        )
-                        .addOnCompleteListener { task ->
-
-                            if(task.isSuccessful){
-                                println("Account Created")
-                            }else{
-                                println(task.exception?.message)
+                            errorMessage = null
+                            isLoading = true
+                            signUpWithEmail(email, password) { success, error ->
+                                isLoading = false
+                                if (success) {
+                                    onAuthSuccess()
+                                } else {
+                                    errorMessage = error
+                                }
                             }
-                        } },
+                        },
+                        enabled = !isLoading,
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -191,6 +166,10 @@ fun CreateAccountScreen(onBackToLogin: () -> Unit) {
             }
             Spacer(modifier = Modifier.height(30.dp))
             MidlineforSignup()
+            Image(
+                painter = painterResource(id = R.drawable.google),
+
+            )
             Spacer(modifier = Modifier.height(30.dp))
             Row(
                 horizontalArrangement = Arrangement.Center,
