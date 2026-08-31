@@ -19,9 +19,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -80,23 +82,24 @@ fun PhoneNumberScreen(
                 errorMessage = null
                 isLoading = true
 
-                sendOtp(
-                    phoneNumber = phoneNumber,
-                    activity = activity,
-                    onCodeSent = { verificationId ->
-                        isLoading = false
-                        onOtpSent(verificationId) // ← ye Step 2 (OTP screen) pe navigate karega
-                    },
-                    onVerified = { result ->
-                        isLoading = false
-                        // auto-verify ho gaya, seedha sign in ho jayega
-                        // (rare case, kuch devices mein hota hai)
-                    },
-                    onError = { error ->
-                        isLoading = false
-                        errorMessage = error
-                    }
-                )
+                // sendOtp(
+                //     phoneNumber = phoneNumber,
+                //     activity = activity,
+                //     onCodeSent = { verificationId: String ->
+                //         isLoading = false
+                //         onOtpSent(verificationId)
+                //     },
+                //     onVerified = { result: Any ->
+                //         isLoading = false
+                //     },
+                //     onError = { error: String ->
+                //         isLoading = false
+                //         errorMessage = error
+                //     }
+                // )
+                // Placeholder as sendOtp is missing
+                isLoading = false
+                errorMessage = "sendOtp function is missing in the project"
             },
             enabled = !isLoading,
             modifier = Modifier.fillMaxWidth()

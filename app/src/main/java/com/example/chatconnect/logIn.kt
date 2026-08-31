@@ -47,26 +47,42 @@ import com.example.chatconnect.ui.theme.TextPrimary
 
 
 @Composable
-fun CompleteScreen(onSignUpClick: () -> Unit = {}){
-    var email by remember { mutableStateOf("")}
-    var password by remember { mutableStateOf("")}
-    var isLoading by remember { mutableStateOf(false)}
+fun CompleteScreen(
+    onSignUpClick: () -> Unit = {},
+    onLoginSuccess: () -> Unit = {}
+) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+    
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter
+    ) {
         Background()
-        Logo()
+        
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Logo()
+            
             Spacer(modifier = Modifier.height(20.dp))
+            
             Text(
-                text = "WelCome Back",
+                text = "Welcome Back",
                 color = Color.White,
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold
             )
+            
             Spacer(modifier = Modifier.height(20.dp))
+            
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email")},
+                label = { Text("Email") },
                 singleLine = true,
                 shape = RoundedCornerShape(14.dp),
                 modifier = Modifier
@@ -81,7 +97,9 @@ fun CompleteScreen(onSignUpClick: () -> Unit = {}){
                     focusedLabelColor = Color.White
                 ),
             )
+            
             Spacer(modifier = Modifier.height(12.dp))
+            
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
@@ -91,6 +109,7 @@ fun CompleteScreen(onSignUpClick: () -> Unit = {}){
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
+                visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
                 colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color.White,
                     unfocusedBorderColor = Color.White,
@@ -99,9 +118,10 @@ fun CompleteScreen(onSignUpClick: () -> Unit = {}){
                     cursorColor = Color.White,
                     focusedLabelColor = Color.White
                 ),
-
             )
+            
             Spacer(modifier = Modifier.height(8.dp))
+            
             Text(
                 text = "Forgot password?",
                 color = NeonCyan,
@@ -111,7 +131,18 @@ fun CompleteScreen(onSignUpClick: () -> Unit = {}){
                     .align(Alignment.End)
                     .clickable { /* Handle click */ }
             )
+            
             Spacer(modifier = Modifier.height(30.dp))
+            
+            if (errorMessage != null) {
+                Text(
+                    text = errorMessage!!,
+                    color = Color.Red,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+            }
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -119,45 +150,53 @@ fun CompleteScreen(onSignUpClick: () -> Unit = {}){
                     .height(56.dp)
                     .clip(RoundedCornerShape(16.dp))
                     .background(Brush.linearGradient(listOf(NeonBlue, NeonCyan)))
-                    .clickable {
+                    .clickable(enabled = !isLoading) {
+                        if (email.isBlank() || password.isBlank()) {
+                            errorMessage = "Please fill all fields"
+                            return@clickable
+                        }
                         errorMessage = null
                         isLoading = true
-                        signInWithEmail(email, password) { success, error ->
+                        signInWithEmail(email.trim(), password.trim()) { success, error ->
                             isLoading = false
                             if (success) {
-                                onAuthSuccess()
+                                onLoginSuccess()
                             } else {
                                 errorMessage = error
                             }
                         }
                     },
-                enabled = !isLoading,
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "Log In",
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                if (isLoading) {
+                    androidx.compose.material3.CircularProgressIndicator(color = Color.White)
+                } else {
+                    Text(
+                        text = "Log In",
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
+            
             Spacer(modifier = Modifier.height(30.dp))
+            
             Midline()
+            
             Spacer(modifier = Modifier.height(30.dp))
+            
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-
                 Text(
                     text = "Don't have an account?",
                     color = Color.White,
                     fontSize = 16.sp
                 )
-
                 Spacer(modifier = Modifier.width(4.dp))
-
                 Text(
                     text = "Sign Up",
                     color = NeonCyan,

@@ -35,13 +35,26 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("login") {
                             CompleteScreen(
-                                onSignUpClick = { navController.navigate("signup") }
+                                onSignUpClick = { navController.navigate("signup") },
+                                onLoginSuccess = { 
+                                    navController.navigate("home") {
+                                        popUpTo("login") { inclusive = true }
+                                    }
+                                }
                             )
                         }
                         composable("signup") {
                             CreateAccountScreen(
-                                onBackToLogin = { navController.popBackStack() }
+                                onBackToLogin = { navController.popBackStack() },
+                                onAuthSuccess = {
+                                    navController.navigate("home") {
+                                        popUpTo("welcome") { inclusive = true }
+                                    }
+                                }
                             )
+                        }
+                        composable("home") {
+                            HomeUIPage()
                         }
                     }
                 }

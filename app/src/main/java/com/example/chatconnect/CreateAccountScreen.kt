@@ -46,24 +46,41 @@ import com.example.chatconnect.ui.theme.NeonPurple
 import com.example.chatconnect.ui.theme.TextPrimary
 
 @Composable
-fun CreateAccountScreen(onBackToLogin: () -> Unit) {
-    var fullName by remember { mutableStateOf("")}
-    var email by remember { mutableStateOf("")}
-    var password by remember { mutableStateOf("")}
-    var isLoading by remember { mutableStateOf(false)}
+fun CreateAccountScreen(
+    onBackToLogin: () -> Unit,
+    onAuthSuccess: () -> Unit = {}
+) {
+    var fullName by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
-    Box(modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.TopCenter) {
+    
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter
+    ) {
         BackgroundforSignUp()
-        Logo()
-                 Spacer(modifier = Modifier.height(12.dp))
+        
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 30.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Logo()
+            
+            Spacer(modifier = Modifier.height(12.dp))
+            
             Text(
                 text = "Create an Account",
                 color = Color.White,
                 fontSize = 27.sp,
                 fontWeight = FontWeight.Bold
             )
+            
             Spacer(modifier = Modifier.height(20.dp))
+            
             OutlinedTextField(
                 value = fullName,
                 onValueChange = { fullName = it },
@@ -87,11 +104,13 @@ fun CreateAccountScreen(onBackToLogin: () -> Unit) {
                     capitalization = androidx.compose.ui.text.input.KeyboardCapitalization.Words
                 )
             )
+            
             Spacer(modifier = Modifier.height(12.dp))
+            
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email")},
+                label = { Text("Email") },
                 singleLine = true,
                 shape = RoundedCornerShape(14.dp),
                 modifier = Modifier
@@ -110,7 +129,9 @@ fun CreateAccountScreen(onBackToLogin: () -> Unit) {
                     keyboardType = androidx.compose.ui.text.input.KeyboardType.Email
                 )
             )
+            
             Spacer(modifier = Modifier.height(12.dp))
+            
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
@@ -134,7 +155,18 @@ fun CreateAccountScreen(onBackToLogin: () -> Unit) {
                     keyboardType = androidx.compose.ui.text.input.KeyboardType.Password
                 )
             )
+            
             Spacer(modifier = Modifier.height(25.dp))
+            
+            if (errorMessage != null) {
+                Text(
+                    text = errorMessage!!,
+                    color = Color.Red,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+            }
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -142,49 +174,63 @@ fun CreateAccountScreen(onBackToLogin: () -> Unit) {
                     .height(56.dp)
                     .clip(RoundedCornerShape(16.dp))
                     .background(Brush.linearGradient(listOf(NeonBlue, NeonCyan)))
-                    .clickable {
-                            errorMessage = null
-                            isLoading = true
-                            signUpWithEmail(email, password) { success, error ->
-                                isLoading = false
-                                if (success) {
-                                    onAuthSuccess()
-                                } else {
-                                    errorMessage = error
-                                }
+                    .clickable(enabled = !isLoading) {
+                        errorMessage = null
+                        if (email.isBlank() || password.length < 6) {
+                            errorMessage = "Please enter valid email and 6+ char password"
+                            return@clickable
+                        }
+                        isLoading = true
+                        signUpWithEmail(email.trim(), password.trim()) { success, error ->
+                            isLoading = false
+                            if (success) {
+                                onAuthSuccess()
+                            } else {
+                                errorMessage = error
                             }
-                        },
-                        enabled = !isLoading,
+                        }
+                    },
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "Sign Up",
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                if (isLoading) {
+                    androidx.compose.material3.CircularProgressIndicator(color = Color.White)
+                } else {
+                    Text(
+                        text = "Sign Up",
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
+            
             Spacer(modifier = Modifier.height(30.dp))
+            
             MidlineforSignup()
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
             Image(
                 painter = painterResource(id = R.drawable.google),
-
+                contentDescription = "Google Sign In",
+                modifier = Modifier
+                    .size(40.dp)
+                    .clickable { /* Handle Google Sign In */ }
             )
+            
             Spacer(modifier = Modifier.height(30.dp))
+            
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-
                 Text(
                     text = "Already have an account ?",
                     color = Color.White,
                     fontSize = 16.sp
                 )
-
                 Spacer(modifier = Modifier.width(4.dp))
-
                 Text(
                     text = "Log In",
                     color = NeonCyan,
@@ -196,7 +242,6 @@ fun CreateAccountScreen(onBackToLogin: () -> Unit) {
                 )
             }
         }
-
     }
 }
 
