@@ -46,7 +46,12 @@ class MainActivity : ComponentActivity() {
                         composable("signup") {
                             CreateAccountScreen(
                                 onBackToLogin = { navController.popBackStack() },
-                                onAuthSuccess = {
+                                onAuthSuccess = { navController.navigate("verify") }
+                            )
+                        }
+                        composable("verify") {
+                            VerifyEmailScreen(
+                                onVerified = {
                                     navController.navigate("home") {
                                         popUpTo("welcome") { inclusive = true }
                                     }
