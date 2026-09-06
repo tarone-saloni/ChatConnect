@@ -38,7 +38,7 @@ fun HomeUIPage() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 90.dp, bottom = 80.dp) // topbar/bottombar jitni jagah lete hain, utni padding
+                .padding(top = 90.dp, bottom = 80.dp) // padding equal to the space the topbar/bottombar take up
         ) {
             when (selectedTab) {
                 0 -> ChatUI()
