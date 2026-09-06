@@ -37,7 +37,7 @@ fun VerifyEmailScreen(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Email Verify Kijiye",
+                text = "Verify your email",
                 color = Color.White,
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold
@@ -46,9 +46,9 @@ fun VerifyEmailScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Aapke email par ek link bheja gaya hai. " +
-                        "Email kholiye, link click kijiye, phir yahan wapas aakar " +
-                        "neeche wala button dabaiye.",
+                text = "We've sent a link to your email. " +
+                        "Open the email, click the link, then come back here and " +
+                        "tap the button below.",
                 color = Color.White,
                 fontSize = 15.sp,
                 textAlign = TextAlign.Center
@@ -80,19 +80,19 @@ fun VerifyEmailScreen(
                 if (isLoading) {
                     CircularProgressIndicator(color = Color.White)
                 } else {
-                    Text("Maine Verify Kar Liya", color = Color.White, fontSize = 18.sp)
+                    Text("I've verified", color = Color.White, fontSize = 18.sp)
                 }
             }
 
             Spacer(modifier = Modifier.height(20.dp))
 
             Text(
-                text = "Link dobara bhejiye",
+                text = "Resend link",
                 color = NeonCyan,
                 fontSize = 15.sp,
                 modifier = Modifier.clickable {
                     AuthManager.resendVerification { success, error ->
-                        message = if (success) "Link bhej diya gaya" else error
+                        message = if (success) "Link sent" else error
                     }
                 }
             )
