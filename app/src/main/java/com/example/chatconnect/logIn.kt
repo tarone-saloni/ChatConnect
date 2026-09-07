@@ -64,7 +64,6 @@ fun CompleteScreen(
     var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
-    // As soon as the user types digits or a +, treat this as a phone login.
     val isPhoneInput = isPhoneNumberInput(emailOrPhone)
 
     Box(
