@@ -13,7 +13,7 @@
             <option value="$PROJECT_DIR$/app" />
           </set>
         </option>
-        <option name="myGradleHome" value="$USER_HOME$/gradle-9.7.0/gradle-9.7.0" />
+        <option name="myGradleHome" value="$USER_HOME$/Downloads/gradle-9.7.0" />
       </GradleProjectSettings>
     </option>
   </component>
