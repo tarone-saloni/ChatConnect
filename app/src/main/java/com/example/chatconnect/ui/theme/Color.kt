@@ -22,3 +22,4 @@ val TextPrimary   = Color(0xFFFFFFFF)
 val TextSecondary = Color(0xFFB0B8D1)
 val CardBg        = Color(0xFF111827).copy(alpha = 0.7f)
 val BorderColor   = Color(0xFF1F2B4A)
+
