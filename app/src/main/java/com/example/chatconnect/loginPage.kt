@@ -1,5 +1,6 @@
 package com.example.chatconnect
 
+import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,8 +37,7 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.scale
-import androidx.compose.ui.graphics.vector.PathParser
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -54,38 +54,45 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// Colours taken from the login design screenshot
-private val PageBg = Color(0xFF0A0E14)
-private val GridLine = Color(0xFF111821)
-private val CardBg = Color(0xFF0F151D)
-private val FieldBg = Color(0xFF0B1016)
-private val Border = Color(0xFF1E2731)
-private val Mint = Color(0xFF5EEAD4)
-private val TextWhite = Color(0xFFE6EDF3)
-private val TextGray = Color(0xFF8B949E)
-private val SignInBg = Color(0xFF13232A)
-private val Mono = FontFamily.Monospace
+
+val PageBg = Color(0xFF0A0E14)
+val GridLine = Color(0xFF111821)
+val CardBg = Color(0xFF0F151D)
+val FieldBg = Color(0xFF0B1016)
+val Border = Color(0xFF1E2731)
+val Mint = Color(0xFF5EEAD4)
+val TextWhite = Color(0xFFE6EDF3)
+val TextGray = Color(0xFF8B949E)
+val SignInBg = Color(0xFF13232A)
+val Mono = FontFamily.Monospace
 
 @Preview(heightDp = 900)
 @Composable
 fun Forlogo() {
+    AuthPage { signIn(onCreateAccountClick = {}) }
+}
+fun Modifier.gridBackground(): Modifier = this
+    .background(PageBg)
+    .drawBehind {
+        val step = 28.dp.toPx()
+        var x = 0f
+        while (x < size.width) {
+            drawLine(GridLine, Offset(x, 0f), Offset(x, size.height), 1f)
+            x += step
+        }
+        var y = 0f
+        while (y < size.height) {
+            drawLine(GridLine, Offset(0f, y), Offset(size.width, y), 1f)
+            y += step
+        }
+    }
+
+@Composable
+fun AuthPage(card: @Composable () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(PageBg)
-            .drawBehind {
-                val step = 28.dp.toPx()
-                var x = 0f
-                while (x < size.width) {
-                    drawLine(GridLine, Offset(x, 0f), Offset(x, size.height), 1f)
-                    x += step
-                }
-                var y = 0f
-                while (y < size.height) {
-                    drawLine(GridLine, Offset(0f, y), Offset(size.width, y), 1f)
-                    y += step
-                }
-            }
+            .gridBackground()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp, vertical = 60.dp)
     ) {
@@ -163,12 +170,13 @@ fun Forlogo() {
 
         Spacer(modifier = Modifier.height(27.dp))
 
-        signIn()
+        card()
     }
 }
 
 @Composable
-fun signIn() {
+fun signIn(onCreateAccountClick: () -> Unit, onSignInSuccess: () -> Unit = {}) {
+    val context = LocalContext.current
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
@@ -177,7 +185,7 @@ fun signIn() {
         modifier = Modifier
             .fillMaxWidth()
             .drawBehind {
-                // mint corner brackets: top-left and bottom-right
+
                 val len = 16.dp.toPx()
                 val stroke = 2.dp.toPx()
                 val gap = 6.dp.toPx()
@@ -191,7 +199,7 @@ fun signIn() {
             .background(CardBg)
             .border(1.dp, Border)
     ) {
-        // AUTHENTICATION ........ ■ SECURE
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -276,7 +284,6 @@ fun signIn() {
 
             Spacer(modifier = Modifier.height(18.dp))
 
-            // SIGN IN button
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
@@ -285,7 +292,14 @@ fun signIn() {
                     .background(SignInBg)
                     .border(1.dp, Border)
                     .clickable {
-                        // Button click hone par ye code chalega
+                        if (email.isBlank() || password.isBlank()) {
+                            Toast.makeText(context, "Email aur password dalo", Toast.LENGTH_SHORT).show()
+                            return@clickable
+                        }
+                        AuthManager.signInWithEmail(email.trim(), password) { ok, error ->
+                            if (ok) onSignInSuccess()
+                            else Toast.makeText(context, error ?: "Sign in failed", Toast.LENGTH_SHORT).show()
+                        }
                     }
             ) {
                 Text(
@@ -300,7 +314,6 @@ fun signIn() {
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // ------------ OR ------------
             Row(verticalAlignment = Alignment.CenterVertically) {
                 DashedLine(Modifier.weight(1f))
                 Text(
@@ -316,7 +329,6 @@ fun signIn() {
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // CONTINUE WITH GITHUB button
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
@@ -328,7 +340,11 @@ fun signIn() {
                         // Button click hone par ye code chalega
                     }
             ) {
-                GitHubIcon()
+                Image(
+                    painter = painterResource(id = R.drawable.github_5968866),
+                    contentDescription = "github logo",
+                    modifier = Modifier.size(20.dp)
+                )
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
                     text = "CONTINUE WITH GITHUB",
@@ -348,7 +364,6 @@ fun signIn() {
                 .background(Border)
         )
 
-        // New here? Create an account
         Row(
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier
@@ -368,16 +383,14 @@ fun signIn() {
                 fontWeight = FontWeight.Bold,
                 fontSize = 13.sp,
                 textDecoration = TextDecoration.Underline,
-                modifier = Modifier.clickable {
-                    // Create account screen par jaana hai
-                }
+                modifier = Modifier.clickable { onCreateAccountClick() }
             )
         }
     }
 }
 
 @Composable
-private fun FieldTitle(text: String) {
+fun FieldTitle(text: String) {
     Text(
         text = text,
         color = TextWhite,
@@ -389,7 +402,7 @@ private fun FieldTitle(text: String) {
 }
 
 @Composable
-private fun DesignTextField(
+fun DesignTextField(
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
@@ -441,7 +454,7 @@ private fun DesignTextField(
 }
 
 @Composable
-private fun DashedLine(modifier: Modifier) {
+fun DashedLine(modifier: Modifier) {
     Box(
         modifier = modifier
             .height(1.dp)
@@ -458,7 +471,7 @@ private fun DashedLine(modifier: Modifier) {
 }
 
 @Composable
-private fun MailIcon() {
+fun MailIcon() {
     Canvas(modifier = Modifier.size(20.dp, 16.dp)) {
         val stroke = 1.5.dp.toPx()
         drawRect(color = TextGray, style = Stroke(stroke))
@@ -468,7 +481,7 @@ private fun MailIcon() {
 }
 
 @Composable
-private fun EyeIcon(modifier: Modifier = Modifier) {
+fun EyeIcon(modifier: Modifier = Modifier) {
     Canvas(modifier = modifier.size(24.dp)) {
         val stroke = 1.5.dp.toPx()
         val eyeHeight = size.height * 0.55f
@@ -479,27 +492,5 @@ private fun EyeIcon(modifier: Modifier = Modifier) {
             style = Stroke(stroke)
         )
         drawCircle(color = TextGray, radius = size.minDimension * 0.14f, style = Stroke(stroke))
-    }
-}
-
-// GitHub logo outline (24x24 viewport)
-private val gitHubPath = PathParser().parsePathString(
-    "M12,0.297c-6.63,0 -12,5.373 -12,12 0,5.303 3.438,9.8 8.205,11.385 0.6,0.113 0.82,-0.258 0.82,-0.577 " +
-        "0,-0.285 -0.01,-1.04 -0.015,-2.04 -3.338,0.724 -4.042,-1.61 -4.042,-1.61C4.422,18.07 3.633,17.7 3.633,17.7" +
-        "c-1.087,-0.744 0.084,-0.729 0.084,-0.729 1.205,0.084 1.838,1.236 1.838,1.236 1.07,1.835 2.809,1.305 " +
-        "3.495,0.998 0.108,-0.776 0.417,-1.305 0.76,-1.605 -2.665,-0.3 -5.466,-1.332 -5.466,-5.93 0,-1.31 " +
-        "0.465,-2.38 1.235,-3.22 -0.135,-0.303 -0.54,-1.523 0.105,-3.176 0,0 1.005,-0.322 3.3,1.23 0.96,-0.267 " +
-        "1.98,-0.399 3,-0.405 1.02,0.006 2.04,0.138 3,0.405 2.28,-1.552 3.285,-1.23 3.285,-1.23 0.645,1.653 " +
-        "0.24,2.873 0.12,3.176 0.765,0.84 1.23,1.91 1.23,3.22 0,4.61 -2.805,5.625 -5.475,5.92 0.42,0.36 " +
-        "0.81,1.096 0.81,2.22 0,1.606 -0.015,2.896 -0.015,3.286 0,0.315 0.21,0.69 0.825,0.57C20.565,22.092 " +
-        "24,17.592 24,12.297c0,-6.627 -5.373,-12 -12,-12"
-).toPath()
-
-@Composable
-private fun GitHubIcon() {
-    Canvas(modifier = Modifier.size(18.dp)) {
-        scale(size.width / 24f, pivot = Offset.Zero) {
-            drawPath(gitHubPath, color = TextWhite)
-        }
     }
 }
