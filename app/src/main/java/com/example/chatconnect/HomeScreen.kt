@@ -1,6 +1,11 @@
 package com.example.chatconnect
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -51,6 +56,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlin.math.PI
+import kotlin.math.sin
 
 val SkyBlue = Color(0xFF7DD3FC)
 val Amber = Color(0xFFF5B85A)
@@ -60,10 +67,7 @@ val NavActiveBg = Color(0xFF13232A)
 
 data class RecentChat(val initials: String, val name: String, val action: String, val date: String)
 
-private val recentChats = listOf(
-    RecentChat("AV", "AMIT VERMA", "sent you a message", "Sep 26"),
-    RecentChat("AV", "AMIT VERMA", "sent you a message", "Sep 26"),
-)
+private val recentChats = emptyList<RecentChat>()
 
 @Preview(heightDp = 900)
 @Composable
@@ -105,10 +109,10 @@ fun HomeUIPage() {
         }
 
         Box(modifier = Modifier.weight(1f)) {
-            if (searching) {
-                SearchResults(query)
-            } else {
-                HomeContent()
+            when {
+                searching -> SearchResults(query)
+                selectedTab == 1 -> MessagesContent()
+                else -> HomeContent()
             }
         }
 
@@ -126,7 +130,7 @@ fun HomeTopBar(notifCount: Int, onSearchClick: () -> Unit, onNotifClick: () -> U
             .drawBehind {
                 drawLine(Border, Offset(0f, size.height), Offset(size.width, size.height), 1.dp.toPx())
             }
-            .padding(horizontal = 20.dp, vertical = 18.dp)
+            .padding(horizontal = 20.dp, vertical = 25.dp)
     ) {
         Image(
             painter = painterResource(id = R.drawable.logo_192),
@@ -343,12 +347,12 @@ fun HomeContent() {
 
         Column(modifier = Modifier.border(1.dp, Border)) {
             Row {
-                StatBox("01", "12", "MESSAGES", Mint, Modifier.weight(1f))
-                StatBox("02", "1", "CONVERSATIONS", SkyBlue, Modifier.weight(1f))
+                StatBox("01", "0", "MESSAGES", Mint, Modifier.weight(1f))
+                StatBox("02", "0", "CONVERSATIONS", SkyBlue, Modifier.weight(1f))
             }
             Row {
                 StatBox("03", "0", "GROUPS", Amber, Modifier.weight(1f))
-                StatBox("04", "1", "ONLINE NOW", Mint, Modifier.weight(1f))
+                StatBox("04", "0", "ONLINE NOW", Mint, Modifier.weight(1f))
             }
         }
 
@@ -363,7 +367,7 @@ fun HomeContent() {
             }
             Row {
                 QuickAction("FIND PEOPLE", Modifier.weight(1f))
-                QuickAction("ASK GANDU", Modifier.weight(1f))
+                QuickAction("ASK CHATBOT", Modifier.weight(1f))
             }
         }
 
@@ -400,6 +404,15 @@ fun HomeContent() {
                     fontSize = 12.sp,
                     letterSpacing = 3.sp,
                     modifier = Modifier.clickable { }
+                )
+            }
+            if (recentChats.isEmpty()) {
+                Text(
+                    text = "No recent activity",
+                    color = TextGray,
+                    fontFamily = Mono,
+                    fontSize = 13.sp,
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 24.dp)
                 )
             }
             recentChats.forEachIndexed { i, chat ->
@@ -545,19 +558,32 @@ fun StatusStrip() {
         Spacer(modifier = Modifier.width(10.dp))
         Text(text = "LINK.ONLINE", color = TextGray, fontFamily = Mono, fontSize = 11.sp, letterSpacing = 2.sp)
         Spacer(modifier = Modifier.width(10.dp))
-        Canvas(modifier = Modifier.size(width = 26.dp, height = 12.dp)) {
-            val heights = listOf(0.6f, 0.8f, 0.5f, 1f, 0.4f)
-            val barW = size.width / 7f
-            heights.forEachIndexed { i, h ->
-                drawRect(
-                    color = if (i < 4) Mint else Border,
-                    topLeft = Offset(i * barW * 1.4f, size.height * (1 - h)),
-                    size = Size(barW, size.height * h)
-                )
-            }
-        }
+        SignalBars()
         Spacer(modifier = Modifier.weight(1f))
         Text(text = "V2.0", color = TextGray, fontFamily = Mono, fontSize = 11.sp, letterSpacing = 2.sp)
+    }
+}
+
+// LINK.ONLINE ke baad wali bars lagatar upar-neeche hilti rehti hain
+@Composable
+fun SignalBars() {
+    val transition = rememberInfiniteTransition(label = "signal")
+    val phase by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = (2 * PI).toFloat(),
+        animationSpec = infiniteRepeatable(tween(durationMillis = 1200, easing = LinearEasing)),
+        label = "phase"
+    )
+    Canvas(modifier = Modifier.size(width = 26.dp, height = 12.dp)) {
+        val barW = size.width / 7f
+        for (i in 0 until 5) {
+            val h = 0.6f + 0.4f * sin(phase + i * 1.2f)
+            drawRect(
+                color = if (i < 4) Mint else Border,
+                topLeft = Offset(i * barW * 1.4f, size.height * (1 - h)),
+                size = Size(barW, size.height * h)
+            )
+        }
     }
 }
 
