@@ -30,8 +30,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -79,11 +81,15 @@ fun HomeUIPagePreview() {
 fun HomeUIPage() {
     var searching by remember { mutableStateOf(false) }
     var query by remember { mutableStateOf("") }
-    var selectedTab by remember { mutableStateOf(0) }
+    var selectedTab by rememberSaveable { mutableIntStateOf(0) }
 
     BackHandler(enabled = searching) {
         searching = false
         query = ""
+    }
+    // dusre tab par back dabane se app band nahi hoga, pehle Home par aayega
+    BackHandler(enabled = !searching && selectedTab != 0) {
+        selectedTab = 0
     }
 
     Column(
@@ -112,12 +118,21 @@ fun HomeUIPage() {
             when {
                 searching -> SearchResults(query)
                 selectedTab == 1 -> MessagesContent()
+                selectedTab == 2 -> AssistantContent()
+                selectedTab == 3 -> ProfileScreen()
                 else -> HomeContent()
             }
         }
 
         StatusStrip()
-        BottomNav(selected = selectedTab, onSelect = { selectedTab = it })
+        BottomNav(
+            selected = selectedTab,
+            onSelect = {
+                searching = false
+                query = ""
+                selectedTab = it
+            }
+        )
     }
 }
 
@@ -419,6 +434,24 @@ fun HomeContent() {
                 ActivityRow(chat, showDivider = i < recentChats.lastIndex)
             }
         }
+    }
+}
+
+@Composable
+fun AssistantContent() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 20.dp, vertical = 24.dp)
+    ) {
+        SectionLabel("ASSISTANT")
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(
+            text = "Coming soon",
+            color = TextGray,
+            fontFamily = Mono,
+            fontSize = 13.sp
+        )
     }
 }
 
